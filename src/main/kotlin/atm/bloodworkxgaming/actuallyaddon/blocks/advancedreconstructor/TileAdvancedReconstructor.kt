@@ -25,8 +25,7 @@ class TileAdvancedReconstructor : TileEntityBase(), ITickable {
 
     private val stackHandlerInput = ItemStackHandlerInput()
     private val stackHandlerOutput = ItemStackHandlerOutput()
-    private val energyStorage = EnergyStorageBase(10000, 10, 0)
-
+    val energyStorage = EnergyStorageBase(10000, 10, 0)
 
     init {
         recipes.forEach { println("it = ${Arrays.toString(it.input.matchingStacks)} -> ${it.output} # ${it.type}") }
@@ -118,6 +117,7 @@ class TileAdvancedReconstructor : TileEntityBase(), ITickable {
 
         super.readFromNBT(compound)
     }
+
 
     inner class ItemStackHandlerOutput : ItemStackHandler(1) {
         override fun onContentsChanged(slot: Int) = markDirty()
