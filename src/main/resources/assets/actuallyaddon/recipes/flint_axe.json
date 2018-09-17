@@ -1,0 +1,22 @@
+{
+  "result": {
+    "item": "woodenflint:flint_axe"
+  },
+  "pattern": [
+    " xx",
+    " sx",
+    " s "
+  ],
+  "type": "forge:ore_shaped",
+  "mirrored": true,
+  "key": {
+    "x": {
+      "type": "forge:ore_dict",
+      "ore": "flint"
+    },
+    "s": {
+      "type": "forge:ore_dict",
+      "ore": "stickWood"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+[
+{
+  "modid": "woodenflint",
+  "name": "Wooden Flint",
+  "description": "Because who likes punching trees.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["BloodWorkXGaming"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

@@ -1,0 +1,7 @@
+item.flint_shovel.name=Flint Shovel
+item.flint_axe.name=Flint Axe
+item.flint_pickaxe.name=Flint Pickaxe
+item.flint_sword.name=Flint Sword
+item.flint_hoe.name=Flint Hoe
+
+death.attack.pokingTrees=%s died from a splinter in their hand.

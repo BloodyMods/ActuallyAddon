@@ -1,0 +1,78 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven { url = "http://files.minecraftforge.net/maven" }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+    }
+}
+
+plugins {
+    id "org.jetbrains.kotlin.jvm" version "1.2.51"
+}
+
+apply plugin: 'net.minecraftforge.gradle.forge'
+
+version = "0.1.1"
+group = "atm.bloodworkxgaming.woodenflint" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "woodenflint"
+
+sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+compileJava {
+    sourceCompatibility = targetCompatibility = '1.8'
+}
+
+minecraft {
+    version = "1.12.2-14.23.4.2759"
+    runDir = "run"
+    mappings = "snapshot_20180708"
+    useDepAts = true
+    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+}
+
+repositories {
+    jcenter()
+    maven {
+        url "http://maven.shadowfacts.net/"
+    }
+
+    // Required for JEI and Mantle
+    maven {
+        name "DVS1 Maven FS"
+        url "http://dvs1.progwml6.com/files/maven"
+    }
+}
+
+
+dependencies {
+    compile group: "net.shadowfacts", name: "Forgelin", version: "1.7.3"
+    deobfCompile "mezz.jei:jei_1.12.2:4.10.0.199"
+    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+
+}
+
+processResources {
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    // replace stuff in mcmod.info, nothing else
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+                
+        // replace version and mcversion
+        expand 'version':project.version, 'mcversion':project.minecraft.version
+    }
+        
+    // copy everything else except the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
