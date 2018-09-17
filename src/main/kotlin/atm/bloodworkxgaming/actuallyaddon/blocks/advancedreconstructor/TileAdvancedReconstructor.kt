@@ -21,11 +21,15 @@ class TileAdvancedReconstructor : TileEntityBase(), ITickable {
     companion object {
         val recipes: List<LensConversionRecipe> = ActuallyAdditionsAPI.RECONSTRUCTOR_LENS_CONVERSION_RECIPES
         const val energyModifier = 1.5
+        const val INPUT_SIZE = 3
+        const val OUTPUT_SIZE = INPUT_SIZE
+        const val TOTAL_SIZE = INPUT_SIZE + OUTPUT_SIZE
+        const val ENERGY_CAPACITY = 10000
     }
 
-    private val stackHandlerInput = ItemStackHandlerInput()
-    private val stackHandlerOutput = ItemStackHandlerOutput()
-    val energyStorage = EnergyStorageBase(10000, 10, 0)
+    val stackHandlerInput = ItemStackHandlerInput()
+    val stackHandlerOutput = ItemStackHandlerOutput()
+    val energyStorage = EnergyStorageBase(ENERGY_CAPACITY, ENERGY_CAPACITY, 0, this)
 
     init {
         recipes.forEach { println("it = ${Arrays.toString(it.input.matchingStacks)} -> ${it.output} # ${it.type}") }
@@ -43,37 +47,46 @@ class TileAdvancedReconstructor : TileEntityBase(), ITickable {
 
         println("energy ${energyStorage.energyStored}")
 
-        val stack = stackHandlerInput.getStackInSlot(0)
-        println("stack in input $stack")
+        var didStuff = false
 
-        if (stack.isEmpty) {
-            return
+        for (slotIndex in 0 until stackHandlerInput.slots) {
+            val stack = stackHandlerInput.getStackInSlot(slotIndex)
+            println("stack in input $stack")
+
+            if (stack.isEmpty)
+                continue
+
+
+            val inCount = stack.count
+            val recipe = recipes.firstOrNull { it.matches(stack, ActuallyAdditionsAPI.lensDefaultConversion) }
+
+            println("recipe = $recipe")
+
+            recipe ?: continue
+
+            // checks how much energy there is to craft stuff
+            val energyCount = (energyStorage.energyStored / (recipe.energyUsed * energyModifier)).toInt()
+            if (energyCount <= 0) continue
+
+            // checks how many fit in the output slot
+            val outCount = recipe.output.count
+            val outStack = recipe.output.copy()
+            val extractCount = outCount * min(inCount, energyCount)
+            outStack.count = extractCount
+
+            // checks how much it can insert and then actually does the insertion
+            val leftOver = stackHandlerOutput.insertItemInternal(slotIndex, outStack)
+            val effectiveCount = extractCount - leftOver.count
+            stackHandlerInput.extractItemInternal(slotIndex, effectiveCount)
+            val energyCost = (effectiveCount * recipe.energyUsed * energyModifier).toInt()
+            println("effectiveCount = $energyCost")
+            energyStorage.extractEnergyInternal(energyCost, false)
+
+            didStuff = true
         }
 
-        val inCount = stack.count
-        val recipe = recipes.firstOrNull { it.matches(stack, ActuallyAdditionsAPI.lensDefaultConversion) }
-
-        println("recipe = $recipe")
-
-        recipe ?: return
-
-        // checks how much energy there is to craft stuff
-        val energyCount = (energyStorage.energyStored / (recipe.energyUsed * energyModifier)).toInt()
-        if (energyCount <= 0) return
-
-        // checks how many fit in the output slot
-        val outCount = recipe.output.count
-        val outStack = recipe.output.copy()
-        val extractCount = outCount * min(inCount, energyCount)
-        outStack.count = extractCount
-
-        // checks how much it can insert and then actually does the insertion
-        val leftOver = stackHandlerOutput.insertItemInternal(0, outStack)
-        val effectiveCount = extractCount - leftOver.count
-        stackHandlerInput.extractItemInternal(0, effectiveCount)
-        val energyCost = (effectiveCount * recipe.energyUsed * energyModifier).toInt()
-        println("effectiveCount = $energyCost")
-        energyStorage.extractEnergyInternal(energyCost, false)
+        if (didStuff)
+            markDirtyNBT()
     }
 
     override fun hasCapability(capability: Capability<*>, facing: EnumFacing?): Boolean {
@@ -119,15 +132,15 @@ class TileAdvancedReconstructor : TileEntityBase(), ITickable {
     }
 
 
-    inner class ItemStackHandlerOutput : ItemStackHandler(1) {
+    inner class ItemStackHandlerOutput : ItemStackHandler(OUTPUT_SIZE) {
         override fun onContentsChanged(slot: Int) = markDirty()
         override fun insertItem(slot: Int, stack: ItemStack, simulate: Boolean) = stack
         internal fun insertItemInternal(slot: Int, stack: ItemStack) = super.insertItem(slot, stack, false)
     }
 
-    inner class ItemStackHandlerInput : ItemStackHandler(1) {
+    inner class ItemStackHandlerInput : ItemStackHandler(INPUT_SIZE) {
         override fun onContentsChanged(slot: Int) = markDirty()
-        override fun extractItem(slot: Int, amount: Int, simulate: Boolean) = ItemStack.EMPTY!!
+        // override fun extractItem(slot: Int, amount: Int, simulate: Boolean) = ItemStack.EMPTY!!
         internal fun extractItemInternal(slot: Int, amount: Int) = super.extractItem(slot, amount, false)
     }
 }
