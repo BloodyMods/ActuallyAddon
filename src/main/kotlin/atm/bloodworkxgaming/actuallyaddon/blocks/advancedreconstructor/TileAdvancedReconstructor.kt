@@ -1,4 +1,4 @@
-package atm.bloodworkxgaming.actuallyaddon.blocks
+package atm.bloodworkxgaming.actuallyaddon.blocks.advancedreconstructor
 
 import atm.bloodworkxgaming.bloodyLib.energy.EnergyStorageBase
 import atm.bloodworkxgaming.bloodyLib.tile.TileEntityBase
@@ -20,7 +20,7 @@ import kotlin.math.min
 class TileAdvancedReconstructor : TileEntityBase(), ITickable {
     companion object {
         val recipes: List<LensConversionRecipe> = ActuallyAdditionsAPI.RECONSTRUCTOR_LENS_CONVERSION_RECIPES
-        val energyModifer = 1.5
+        const val energyModifier = 1.5
     }
 
     private val stackHandlerInput = ItemStackHandlerInput()
@@ -32,13 +32,13 @@ class TileAdvancedReconstructor : TileEntityBase(), ITickable {
         recipes.forEach { println("it = ${Arrays.toString(it.input.matchingStacks)} -> ${it.output} # ${it.type}") }
     }
 
-    var counter = 0
+    private var counter = 0
     override fun update() {
         world ?: return
 
-        if (counter++ <= 10 || world.isRemote) {
+        if (counter++ <= 10 || world.isRemote)
             return
-        }
+
         counter = 0
 
 
@@ -59,7 +59,7 @@ class TileAdvancedReconstructor : TileEntityBase(), ITickable {
         recipe ?: return
 
         // checks how much energy there is to craft stuff
-        val energyCount = (energyStorage.energyStored / (recipe.energyUsed * energyModifer)).toInt()
+        val energyCount = (energyStorage.energyStored / (recipe.energyUsed * energyModifier)).toInt()
         if (energyCount <= 0) return
 
         // checks how many fit in the output slot
@@ -72,7 +72,7 @@ class TileAdvancedReconstructor : TileEntityBase(), ITickable {
         val leftOver = stackHandlerOutput.insertItemInternal(0, outStack)
         val effectiveCount = extractCount - leftOver.count
         stackHandlerInput.extractItemInternal(0, effectiveCount)
-        val energyCost = (effectiveCount * recipe.energyUsed * energyModifer).toInt()
+        val energyCost = (effectiveCount * recipe.energyUsed * energyModifier).toInt()
         println("effectiveCount = $energyCost")
         energyStorage.extractEnergyInternal(energyCost, false)
     }

@@ -1,7 +1,7 @@
 package atm.bloodworkxgaming.actuallyaddon
 
-import atm.bloodworkxgaming.actuallyaddon.blocks.AdvancedReconstructor
-import atm.bloodworkxgaming.actuallyaddon.blocks.TileAdvancedReconstructor
+import atm.bloodworkxgaming.actuallyaddon.blocks.advancedreconstructor.AdvancedReconstructor
+import atm.bloodworkxgaming.actuallyaddon.blocks.advancedreconstructor.TileAdvancedReconstructor
 import atm.bloodworkxgaming.bloodyLib.registry.AbstractModBlocks
 import atm.bloodworkxgaming.bloodyLib.util.RegistryUtils
 import net.minecraft.block.Block
