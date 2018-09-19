@@ -46,6 +46,9 @@ class ContainerAdvancedReconstructor(inventory: IInventory, private val te: Tile
         val yInput = 32
         val yOutput = 68
 
+        addSlotToContainer(SlotItemHandler(te.stackHandlerBattery, 0, 10, 68))
+
+
         // Add our own slots
         for (i in 0 until min(input.slots, output.slots)) {
             addSlotToContainer(SlotItemHandler(input, i, x, yInput).apply { this.slotNumber = i + 3 })

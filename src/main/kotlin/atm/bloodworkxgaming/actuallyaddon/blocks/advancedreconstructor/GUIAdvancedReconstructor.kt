@@ -39,6 +39,7 @@ class GUIAdvancedReconstructor(tileEntity: TileAdvancedReconstructor, container:
     override fun drawGuiContainerForegroundLayer(mouseX: Int, mouseY: Int, offsetX: Int, offsetY: Int) {
         // Render title
         drawCenteredString(fontRenderer, deviceName, xSize / 2, 6, 4210752)
+        renderHoveredToolTip(mouseX - offsetX, mouseY - offsetY )
 
         // Render Hovering RF text
         if (mouseX >= 12 + offsetX && mouseX <= 24 + offsetX && mouseY >= 23 + offsetY && mouseY <= 61 + offsetY) {

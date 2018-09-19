@@ -29,7 +29,15 @@ class TileAdvancedReconstructor : TileEntityBase(), ITickable {
 
     val stackHandlerInput = ItemStackHandlerInput()
     val stackHandlerOutput = ItemStackHandlerOutput()
+    val stackHandlerBattery = object : ItemStackHandler(1) {
+        override fun onContentsChanged(slot: Int) = markDirty()
+    }
     val energyStorage = EnergyStorageBase(ENERGY_CAPACITY, ENERGY_CAPACITY, 0, this)
+
+    private val inputChanged = BooleanSerializationState()
+    private val outputChanged = BooleanSerializationState()
+    private val batteryChanged = BooleanSerializationState()
+    private val energyChanged = BooleanSerializationState()
 
     init {
         recipes.forEach { println("it = ${Arrays.toString(it.input.matchingStacks)} -> ${it.output} # ${it.type}") }
@@ -38,8 +46,23 @@ class TileAdvancedReconstructor : TileEntityBase(), ITickable {
     private var counter = 0
     override fun update() {
         world ?: return
+        if (world.isRemote) return
 
-        if (counter++ <= 10 || world.isRemote)
+        var didStuff = false
+
+        val battery = stackHandlerBattery.getStackInSlot(0)
+        if (energyStorage.energyStored <= energyStorage.maxEnergyStored && !battery.isEmpty && battery.hasCapability(CapabilityEnergy.ENERGY, null)) {
+            val eng = battery.getCapability(CapabilityEnergy.ENERGY, null)
+            if (eng != null && eng.canExtract()) {
+                val energy = eng.extractEnergy(energyStorage.maxEnergyStored - energyStorage.energyStored, false)
+                energyStorage.receiveEnergyInternal(energy, false)
+                didStuff = true
+                energyChanged.setTrue()
+                batteryChanged.setTrue()
+            }
+        }
+
+        if (counter++ <= 10)
             return
 
         counter = 0
@@ -47,7 +70,6 @@ class TileAdvancedReconstructor : TileEntityBase(), ITickable {
 
         println("energy ${energyStorage.energyStored}")
 
-        var didStuff = false
 
         for (slotIndex in 0 until stackHandlerInput.slots) {
             val stack = stackHandlerInput.getStackInSlot(slotIndex)
@@ -83,10 +105,14 @@ class TileAdvancedReconstructor : TileEntityBase(), ITickable {
             energyStorage.extractEnergyInternal(energyCost, false)
 
             didStuff = true
+            inputChanged.setTrue()
+            outputChanged.setTrue()
+            energyChanged.setTrue()
         }
 
-        if (didStuff)
+        if (didStuff){
             markDirtyNBT()
+        }
     }
 
     override fun hasCapability(capability: Capability<*>, facing: EnumFacing?): Boolean {
@@ -114,6 +140,7 @@ class TileAdvancedReconstructor : TileEntityBase(), ITickable {
     override fun writeToNBT(compound: NBTTagCompound): NBTTagCompound {
         compound.setTag("input", stackHandlerInput.serializeNBT())
         compound.setTag("output", stackHandlerOutput.serializeNBT())
+        compound.setTag("battery", stackHandlerBattery.serializeNBT())
         compound.setTag("energy", energyStorage.serializeNBT())
 
         return super.writeToNBT(compound)
@@ -123,7 +150,9 @@ class TileAdvancedReconstructor : TileEntityBase(), ITickable {
         if (compound.hasKey("input"))
             stackHandlerInput.deserializeNBT(compound.getCompoundTag("input"))
         if (compound.hasKey("output"))
-            stackHandlerInput.deserializeNBT(compound.getCompoundTag("output"))
+            stackHandlerOutput.deserializeNBT(compound.getCompoundTag("output"))
+        if (compound.hasKey("battery"))
+            stackHandlerBattery.deserializeNBT(compound.getCompoundTag("battery"))
 
         if (compound.hasKey("energy"))
             energyStorage.deserializeNBT(compound.getTag("energy") as NBTTagInt?)
@@ -131,17 +160,57 @@ class TileAdvancedReconstructor : TileEntityBase(), ITickable {
         super.readFromNBT(compound)
     }
 
+    /*override fun writeClientDataToNBT(tagCompound: NBTTagCompound): NBTTagCompound {
+        return tagCompound.apply {
+            if (inputChanged.getAndSetFalse())
+                setTag("input", stackHandlerInput.serializeNBT())
+
+            if (outputChanged.getAndSetFalse())
+                setTag("output", stackHandlerOutput.serializeNBT())
+
+            if (batteryChanged.getAndSetFalse())
+                setTag("battery", stackHandlerBattery.serializeNBT())
+
+            if (energyChanged.getAndSetFalse())
+                setTag("energy", energyStorage.serializeNBT())
+        }
+    }*/
 
     inner class ItemStackHandlerOutput : ItemStackHandler(OUTPUT_SIZE) {
-        override fun onContentsChanged(slot: Int) = markDirty()
+        override fun onContentsChanged(slot: Int) {
+            markDirty()
+            outputChanged.setTrue()
+        }
+
         override fun insertItem(slot: Int, stack: ItemStack, simulate: Boolean) = stack
         internal fun insertItemInternal(slot: Int, stack: ItemStack) = super.insertItem(slot, stack, false)
     }
 
     inner class ItemStackHandlerInput : ItemStackHandler(INPUT_SIZE) {
-        override fun onContentsChanged(slot: Int) = markDirty()
+        override fun onContentsChanged(slot: Int) {
+            markDirty()
+            inputChanged.setTrue()
+        }
+
         // override fun extractItem(slot: Int, amount: Int, simulate: Boolean) = ItemStack.EMPTY!!
         internal fun extractItemInternal(slot: Int, amount: Int) = super.extractItem(slot, amount, false)
+    }
+
+    data class BooleanSerializationState(private var value: Boolean = true) {
+        fun getAndInvert(): Boolean {
+            value = !value
+            return !value
+        }
+
+        fun getAndSetFalse(): Boolean {
+            val temp = value
+            value = false
+            return temp
+        }
+
+        fun setTrue() {
+            value = true
+        }
     }
 }
 
