@@ -4,17 +4,18 @@ import atm.bloodworkxgaming.bloodyLib.energy.EnergyStorageBase
 import atm.bloodworkxgaming.bloodyLib.tile.TileEntityBase
 import de.ellpeck.actuallyadditions.api.ActuallyAdditionsAPI
 import de.ellpeck.actuallyadditions.api.recipe.LensConversionRecipe
+import de.ellpeck.actuallyadditions.mod.misc.SoundHandler
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagInt
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumFacing.*
 import net.minecraft.util.ITickable
+import net.minecraft.util.SoundCategory
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.energy.CapabilityEnergy
 import net.minecraftforge.items.CapabilityItemHandler
 import net.minecraftforge.items.ItemStackHandler
-import java.util.*
 import kotlin.math.min
 
 class TileAdvancedReconstructor : TileEntityBase(), ITickable {
@@ -38,10 +39,6 @@ class TileAdvancedReconstructor : TileEntityBase(), ITickable {
     private val outputChanged = BooleanSerializationState()
     private val batteryChanged = BooleanSerializationState()
     private val energyChanged = BooleanSerializationState()
-
-    init {
-        recipes.forEach { println("it = ${Arrays.toString(it.input.matchingStacks)} -> ${it.output} # ${it.type}") }
-    }
 
     private var counter = 0
     override fun update() {
@@ -67,13 +64,10 @@ class TileAdvancedReconstructor : TileEntityBase(), ITickable {
 
         counter = 0
 
-
-        println("energy ${energyStorage.energyStored}")
-
+        var laseredItem = false
 
         for (slotIndex in 0 until stackHandlerInput.slots) {
             val stack = stackHandlerInput.getStackInSlot(slotIndex)
-            println("stack in input $stack")
 
             if (stack.isEmpty)
                 continue
@@ -81,8 +75,6 @@ class TileAdvancedReconstructor : TileEntityBase(), ITickable {
 
             val inCount = stack.count
             val recipe = recipes.firstOrNull { it.matches(stack, ActuallyAdditionsAPI.lensDefaultConversion) }
-
-            println("recipe = $recipe")
 
             recipe ?: continue
 
@@ -99,18 +91,27 @@ class TileAdvancedReconstructor : TileEntityBase(), ITickable {
             // checks how much it can insert and then actually does the insertion
             val leftOver = stackHandlerOutput.insertItemInternal(slotIndex, outStack)
             val effectiveCount = extractCount - leftOver.count
+
+            if (effectiveCount <= 0) continue
+
             stackHandlerInput.extractItemInternal(slotIndex, effectiveCount)
             val energyCost = (effectiveCount * recipe.energyUsed * energyModifier).toInt()
-            println("effectiveCount = $energyCost")
             energyStorage.extractEnergyInternal(energyCost, false)
 
             didStuff = true
+            laseredItem = true
+
             inputChanged.setTrue()
             outputChanged.setTrue()
             energyChanged.setTrue()
+
         }
 
-        if (didStuff){
+        if (laseredItem) {
+            world.playSound(null, pos, SoundHandler.reconstructor, SoundCategory.BLOCKS, 1.0f, 1.0f)
+        }
+
+        if (didStuff) {
             markDirtyNBT()
         }
     }

@@ -59,11 +59,6 @@ class ContainerAdvancedReconstructor(inventory: IInventory, private val te: Tile
     }
 
     override fun transferStackInSlot(playerIn: EntityPlayer?, index: Int): ItemStack? {
-        println("Items: ")
-        for (i in 0 until inventorySlots.size) {
-            println("$i: ${inventorySlots[i].stack}   <-->  ${inventoryItemStacks[i]} ####")
-        }
-
         var previous = ItemStack.EMPTY
 
         val slot = this.inventorySlots[index]
