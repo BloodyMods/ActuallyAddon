@@ -1,22 +1,31 @@
 {
   "result": {
-    "item": "actuallyaddons:advanced_reconstructor"
+    "item": "actuallyaddon:advanced_reconstructor"
   },
   "pattern": [
-    " x ",
-    " x ",
-    " s "
+    "xdx",
+    "frf",
+    "xcx"
   ],
   "type": "forge:ore_shaped",
   "mirrored": true,
   "key": {
     "x": {
-      "type": "forge:ore_dict",
-      "ore": "flint"
+      "item": "actuallyadditions:block_crystal",
+      "data": 5
     },
-    "s": {
-      "type": "forge:ore_dict",
-      "ore": "stickWood"
+    "f": {
+      "item": "actuallyadditions:item_crystal_empowered",
+      "data": 2
+    },
+    "r": {
+      "item": "actuallyadditions:block_atomic_reconstructor"
+    },
+    "d": {
+      "item": "actuallyadditions:block_dropper"
+    },
+    "c": {
+      "item": "actuallyadditions:block_ranged_collector"
     }
   }
 }
