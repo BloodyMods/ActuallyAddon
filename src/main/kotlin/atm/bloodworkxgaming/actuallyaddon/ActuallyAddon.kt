@@ -2,11 +2,11 @@ package atm.bloodworkxgaming.actuallyaddon
 
 import atm.bloodworkxgaming.actuallyaddon.ActuallyAddon.MOD_ID
 import atm.bloodworkxgaming.actuallyaddon.ActuallyAddon.VERSION
-import atm.bloodworkxgaming.bloodyLib.registry.AbstractDataRegistry
-import atm.bloodworkxgaming.bloodyLib.util.BloodyModMain
 import atm.bloodworkxgaming.actuallyaddon.handler.CommonHandler
 import atm.bloodworkxgaming.actuallyaddon.proxy.GuiProxy
 import atm.bloodworkxgaming.actuallyaddon.proxy.SubCommonProxy
+import atm.bloodworkxgaming.bloodyLib.registry.AbstractDataRegistry
+import atm.bloodworkxgaming.bloodyLib.util.BloodyModMain
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.SidedProxy
 import net.minecraftforge.fml.common.event.FMLInitializationEvent

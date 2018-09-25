@@ -5,7 +5,6 @@ import net.minecraft.inventory.Container
 import net.minecraft.inventory.IInventory
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
-import net.minecraftforge.common.IPlantable
 import net.minecraftforge.energy.CapabilityEnergy
 import net.minecraftforge.items.IItemHandler
 import net.minecraftforge.items.SlotItemHandler
