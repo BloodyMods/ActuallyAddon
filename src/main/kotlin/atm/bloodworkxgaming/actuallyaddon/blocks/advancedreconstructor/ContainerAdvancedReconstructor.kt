@@ -6,6 +6,7 @@ import net.minecraft.inventory.IInventory
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import net.minecraftforge.common.IPlantable
+import net.minecraftforge.energy.CapabilityEnergy
 import net.minecraftforge.items.IItemHandler
 import net.minecraftforge.items.SlotItemHandler
 import kotlin.math.min
@@ -78,19 +79,19 @@ class ContainerAdvancedReconstructor(inventory: IInventory, private val te: Tile
 
                 slot.onSlotChanged()
 
-            } else {
+            } else {// Item is in inventory / hotbar, try to place in custom inventory or armor slots
 
-                if (current.item is IPlantable) {
+                if (current.hasCapability(CapabilityEnergy.ENERGY, null)) {
                     if (!this.mergeItemStack(current, 0, 1, false)) {
                         return ItemStack.EMPTY
                     }
                 }
 
 
-                if (!this.mergeItemStack(current, 0, TileAdvancedReconstructor.TOTAL_SIZE, false)) {
+                if (!this.mergeItemStack(current, 1, TileAdvancedReconstructor.TOTAL_SIZE, false)) {
                     return ItemStack.EMPTY
                 }
-            }// Item is in inventory / hotbar, try to place in custom inventory or armor slots
+            }
 
             if (current.isEmpty) {
                 slot.putStack(ItemStack.EMPTY)

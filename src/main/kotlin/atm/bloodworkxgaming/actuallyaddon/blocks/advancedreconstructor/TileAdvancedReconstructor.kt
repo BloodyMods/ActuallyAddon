@@ -1,7 +1,8 @@
 package atm.bloodworkxgaming.actuallyaddon.blocks.advancedreconstructor
 
 import atm.bloodworkxgaming.bloodyLib.energy.EnergyStorageBase
-import atm.bloodworkxgaming.bloodyLib.tile.TileEntityBase
+import atm.bloodworkxgaming.bloodyLib.networking.NBTSerializationState
+import atm.bloodworkxgaming.bloodyLib.tile.TileEntityTickingBase
 import de.ellpeck.actuallyadditions.api.ActuallyAdditionsAPI
 import de.ellpeck.actuallyadditions.api.recipe.LensConversionRecipe
 import de.ellpeck.actuallyadditions.mod.misc.SoundHandler
@@ -10,7 +11,6 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagInt
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumFacing.*
-import net.minecraft.util.ITickable
 import net.minecraft.util.SoundCategory
 import net.minecraftforge.common.capabilities.Capability
 import net.minecraftforge.energy.CapabilityEnergy
@@ -18,13 +18,15 @@ import net.minecraftforge.items.CapabilityItemHandler
 import net.minecraftforge.items.ItemStackHandler
 import kotlin.math.min
 
-class TileAdvancedReconstructor : TileEntityBase(), ITickable {
+class TileAdvancedReconstructor : TileEntityTickingBase() {
+
+
     companion object {
         val recipes: List<LensConversionRecipe> = ActuallyAdditionsAPI.RECONSTRUCTOR_LENS_CONVERSION_RECIPES
         const val energyModifier = 1.5
         const val INPUT_SIZE = 3
         const val OUTPUT_SIZE = INPUT_SIZE
-        const val TOTAL_SIZE = INPUT_SIZE + OUTPUT_SIZE
+        const val TOTAL_SIZE = INPUT_SIZE + OUTPUT_SIZE + 1
         const val ENERGY_CAPACITY = 10000
     }
 
@@ -33,29 +35,26 @@ class TileAdvancedReconstructor : TileEntityBase(), ITickable {
     val stackHandlerBattery = object : ItemStackHandler(1) {
         override fun onContentsChanged(slot: Int) = markDirty()
     }
-    val energyStorage = EnergyStorageBase(ENERGY_CAPACITY, ENERGY_CAPACITY, 0, this)
 
-    private val inputChanged = BooleanSerializationState()
-    private val outputChanged = BooleanSerializationState()
-    private val batteryChanged = BooleanSerializationState()
-    private val energyChanged = BooleanSerializationState()
+    private val inputChanged = NBTSerializationState(this)
+    private val outputChanged = NBTSerializationState(this)
+    private val batteryChanged = NBTSerializationState(this)
+    private val energyChanged = NBTSerializationState(this)
+
+    val energyStorage = EnergyStorageBase(ENERGY_CAPACITY, ENERGY_CAPACITY, 0, energyChanged)
 
     private var counter = 0
-    override fun update() {
-        world ?: return
-        if (world.isRemote) return
 
-        var didStuff = false
-
+    override fun updateTickRemote() {
         val battery = stackHandlerBattery.getStackInSlot(0)
-        if (energyStorage.energyStored <= energyStorage.maxEnergyStored && !battery.isEmpty && battery.hasCapability(CapabilityEnergy.ENERGY, null)) {
+        if (energyStorage.energyStored < energyStorage.maxEnergyStored && !battery.isEmpty && battery.hasCapability(CapabilityEnergy.ENERGY, null)) {
             val eng = battery.getCapability(CapabilityEnergy.ENERGY, null)
             if (eng != null && eng.canExtract()) {
                 val energy = eng.extractEnergy(energyStorage.maxEnergyStored - energyStorage.energyStored, false)
-                energyStorage.receiveEnergyInternal(energy, false)
-                didStuff = true
-                energyChanged.setTrue()
-                batteryChanged.setTrue()
+                if (energyStorage.receiveEnergyInternal(energy, false) > 0) {
+                    energyChanged.scheduleUpdate()
+                    batteryChanged.scheduleUpdate()
+                }
             }
         }
 
@@ -98,21 +97,16 @@ class TileAdvancedReconstructor : TileEntityBase(), ITickable {
             val energyCost = (effectiveCount * recipe.energyUsed * energyModifier).toInt()
             energyStorage.extractEnergyInternal(energyCost, false)
 
-            didStuff = true
             laseredItem = true
 
-            inputChanged.setTrue()
-            outputChanged.setTrue()
-            energyChanged.setTrue()
+            inputChanged.scheduleUpdate()
+            outputChanged.scheduleUpdate()
+            energyChanged.scheduleUpdate()
 
         }
 
         if (laseredItem) {
             world.playSound(null, pos, SoundHandler.reconstructor, SoundCategory.BLOCKS, 1.0f, 1.0f)
-        }
-
-        if (didStuff) {
-            markDirtyNBT()
         }
     }
 
@@ -161,21 +155,21 @@ class TileAdvancedReconstructor : TileEntityBase(), ITickable {
         super.readFromNBT(compound)
     }
 
-    /*override fun writeClientDataToNBT(tagCompound: NBTTagCompound): NBTTagCompound {
+    override fun writeClientDataToNBT(tagCompound: NBTTagCompound, incremental: Boolean): NBTTagCompound {
         return tagCompound.apply {
-            if (inputChanged.getAndSetFalse())
+            if (inputChanged.getAndSetFalse() || incremental)
                 setTag("input", stackHandlerInput.serializeNBT())
 
-            if (outputChanged.getAndSetFalse())
+            if (outputChanged.getAndSetFalse() || incremental)
                 setTag("output", stackHandlerOutput.serializeNBT())
 
-            if (batteryChanged.getAndSetFalse())
+            if (batteryChanged.getAndSetFalse() || incremental)
                 setTag("battery", stackHandlerBattery.serializeNBT())
 
-            if (energyChanged.getAndSetFalse())
+            if (energyChanged.getAndSetFalse() || incremental)
                 setTag("energy", energyStorage.serializeNBT())
         }
-    }*/
+    }
 
     inner class ItemStackHandlerOutput : ItemStackHandler(OUTPUT_SIZE) {
         override fun onContentsChanged(slot: Int) {
@@ -197,21 +191,6 @@ class TileAdvancedReconstructor : TileEntityBase(), ITickable {
         internal fun extractItemInternal(slot: Int, amount: Int) = super.extractItem(slot, amount, false)
     }
 
-    data class BooleanSerializationState(private var value: Boolean = true) {
-        fun getAndInvert(): Boolean {
-            value = !value
-            return !value
-        }
 
-        fun getAndSetFalse(): Boolean {
-            val temp = value
-            value = false
-            return temp
-        }
-
-        fun setTrue() {
-            value = true
-        }
-    }
 }
 
