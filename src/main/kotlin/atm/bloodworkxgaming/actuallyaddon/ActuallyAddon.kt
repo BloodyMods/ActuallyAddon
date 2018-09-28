@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.SidedProxy
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.network.NetworkRegistry
 
-@Mod(modid = MOD_ID, modLanguageAdapter = "net.shadowfacts.forgelin.KotlinAdapter", version = VERSION, dependencies = "required-after:actuallyadditions;required:bloodylib")
+@Mod(modid = MOD_ID, modLanguageAdapter = "net.shadowfacts.forgelin.KotlinAdapter", version = VERSION, dependencies = "required-after:actuallyadditions;required-after:bloodylib")
 object ActuallyAddon : BloodyModMain(CommonHandler) {
     const val MOD_ID = "actuallyaddon"
     const val VERSION = "@VERSION@"

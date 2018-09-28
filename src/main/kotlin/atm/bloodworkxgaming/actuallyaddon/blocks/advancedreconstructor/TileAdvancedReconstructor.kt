@@ -1,5 +1,6 @@
 package atm.bloodworkxgaming.actuallyaddon.blocks.advancedreconstructor
 
+import atm.bloodworkxgaming.actuallyaddon.ActuallyAddonConfig
 import atm.bloodworkxgaming.bloodyLib.energy.EnergyStorageBase
 import atm.bloodworkxgaming.bloodyLib.networking.NBTSerializationState
 import atm.bloodworkxgaming.bloodyLib.tile.TileEntityTickingBase
@@ -23,7 +24,6 @@ class TileAdvancedReconstructor : TileEntityTickingBase() {
 
     companion object {
         val recipes: List<LensConversionRecipe> = ActuallyAdditionsAPI.RECONSTRUCTOR_LENS_CONVERSION_RECIPES
-        const val energyModifier = 1.5
         const val INPUT_SIZE = 3
         const val OUTPUT_SIZE = INPUT_SIZE
         const val TOTAL_SIZE = INPUT_SIZE + OUTPUT_SIZE + 1
@@ -33,7 +33,10 @@ class TileAdvancedReconstructor : TileEntityTickingBase() {
     val stackHandlerInput = ItemStackHandlerInput()
     val stackHandlerOutput = ItemStackHandlerOutput()
     val stackHandlerBattery = object : ItemStackHandler(1) {
-        override fun onContentsChanged(slot: Int) = markDirty()
+        override fun onContentsChanged(slot: Int) {
+            batteryChanged.setTrue()
+            markDirty()
+        }
     }
 
     private val inputChanged = NBTSerializationState(this)
@@ -58,7 +61,7 @@ class TileAdvancedReconstructor : TileEntityTickingBase() {
             }
         }
 
-        if (counter++ <= 10)
+        if (counter++ <= ActuallyAddonConfig.sleepTime)
             return
 
         counter = 0
@@ -78,7 +81,7 @@ class TileAdvancedReconstructor : TileEntityTickingBase() {
             recipe ?: continue
 
             // checks how much energy there is to craft stuff
-            val energyCount = (energyStorage.energyStored / (recipe.energyUsed * energyModifier)).toInt()
+            val energyCount = (energyStorage.energyStored / (recipe.energyUsed * ActuallyAddonConfig.energyModifier)).toInt()
             if (energyCount <= 0) continue
 
             // checks how many fit in the output slot
@@ -94,7 +97,7 @@ class TileAdvancedReconstructor : TileEntityTickingBase() {
             if (effectiveCount <= 0) continue
 
             stackHandlerInput.extractItemInternal(slotIndex, effectiveCount)
-            val energyCost = (effectiveCount * recipe.energyUsed * energyModifier).toInt()
+            val energyCost = (effectiveCount * recipe.energyUsed * ActuallyAddonConfig.energyModifier).toInt()
             energyStorage.extractEnergyInternal(energyCost, false)
 
             laseredItem = true
