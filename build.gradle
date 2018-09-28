@@ -16,6 +16,7 @@ plugins {
 apply plugin: 'net.minecraftforge.gradle.forge'
 
 version = "1.0.1"
+def my_version = version
 group = "atm.bloodworkxgaming.actuallyaddon" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "actuallyaddon"
 
@@ -31,7 +32,7 @@ minecraft {
     useDepAts = true
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
-    replace "@VERSION@", "$version"
+    replace "@VERSION@", "$my_version"
     replaceIn "ActuallyAddon.kt"
 }
 
@@ -39,6 +40,17 @@ repositories {
     jcenter()
     maven {
         url "http://maven.shadowfacts.net/"
+    }
+
+    // Required for RedstoneFlux which is required for TheOneProbe
+    maven {
+        name = "CoFH Maven"
+        url = "http://maven.covers1624.net"
+    }
+
+    // for code chicken libs
+    maven {
+        url "http://chickenbones.net/maven/"
     }
 
     // Required for JEI and Mantle
@@ -52,6 +64,9 @@ repositories {
 dependencies {
     compile group: "net.shadowfacts", name: "Forgelin", version: "1.7.3"
     deobfCompile "mezz.jei:jei_1.12.2:4.10.0.199"
+    // deobfCompile ("cofh:ThermalExpansion:1.12.2-5.5.0.30:universal")
+
+
     compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
 }

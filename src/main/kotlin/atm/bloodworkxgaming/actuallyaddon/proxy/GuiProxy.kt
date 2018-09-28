@@ -1,5 +1,8 @@
 package atm.bloodworkxgaming.actuallyaddon.proxy
 
+import atm.bloodworkxgaming.actuallyaddon.blocks.advancedfluidizer.ContainerAdvancedFluidizer
+import atm.bloodworkxgaming.actuallyaddon.blocks.advancedfluidizer.GUIAdvancedFluidizer
+import atm.bloodworkxgaming.actuallyaddon.blocks.advancedfluidizer.TileAdvancedFluidizer
 import atm.bloodworkxgaming.actuallyaddon.blocks.advancedreconstructor.ContainerAdvancedReconstructor
 import atm.bloodworkxgaming.actuallyaddon.blocks.advancedreconstructor.GUIAdvancedReconstructor
 import atm.bloodworkxgaming.actuallyaddon.blocks.advancedreconstructor.TileAdvancedReconstructor
@@ -16,6 +19,7 @@ object GuiProxy : IGuiHandler {
 
         return when (te) {
             is TileAdvancedReconstructor -> GUIAdvancedReconstructor(te, ContainerAdvancedReconstructor(player.inventory, te))
+            is TileAdvancedFluidizer -> GUIAdvancedFluidizer(te, ContainerAdvancedFluidizer(player.inventory, te))
             else -> null
         }
 
@@ -29,6 +33,7 @@ object GuiProxy : IGuiHandler {
 
         return when (te) {
             is TileAdvancedReconstructor -> ContainerAdvancedReconstructor(player.inventory, te)
+            is TileAdvancedFluidizer -> ContainerAdvancedFluidizer(player.inventory, te)
             else -> null
         }
     }

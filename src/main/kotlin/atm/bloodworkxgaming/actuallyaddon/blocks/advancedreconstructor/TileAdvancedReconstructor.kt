@@ -27,7 +27,6 @@ class TileAdvancedReconstructor : TileEntityTickingBase() {
         const val INPUT_SIZE = 3
         const val OUTPUT_SIZE = INPUT_SIZE
         const val TOTAL_SIZE = INPUT_SIZE + OUTPUT_SIZE + 1
-        const val ENERGY_CAPACITY = 10000
     }
 
     val stackHandlerInput = ItemStackHandlerInput()
@@ -44,7 +43,7 @@ class TileAdvancedReconstructor : TileEntityTickingBase() {
     private val batteryChanged = NBTSerializationState(this)
     private val energyChanged = NBTSerializationState(this)
 
-    val energyStorage = EnergyStorageBase(ENERGY_CAPACITY, ENERGY_CAPACITY, 0, energyChanged)
+    val energyStorage = EnergyStorageBase(ActuallyAddonConfig.advancedReconstructor.maxPowerCapacity, ActuallyAddonConfig.advancedReconstructor.maxPowerIn, 0, energyChanged)
 
     private var counter = 0
 

@@ -1,6 +1,7 @@
 package atm.bloodworkxgaming.actuallyaddon
 
 import atm.bloodworkxgaming.actuallyaddon.ActuallyAddon.MOD_ID
+import atm.bloodworkxgaming.actuallyaddon.ActuallyAddon.MOD_NAME
 import atm.bloodworkxgaming.actuallyaddon.ActuallyAddon.VERSION
 import atm.bloodworkxgaming.actuallyaddon.proxy.GuiProxy
 import atm.bloodworkxgaming.actuallyaddon.proxy.SubCommonProxy
@@ -12,9 +13,15 @@ import net.minecraftforge.fml.common.SidedProxy
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.network.NetworkRegistry
 
-@Mod(modid = MOD_ID, modLanguageAdapter = "net.shadowfacts.forgelin.KotlinAdapter", version = VERSION, dependencies = "required-after:actuallyadditions;required-after:bloodylib")
+@Mod(
+        modid = MOD_ID,
+        modLanguageAdapter = "net.shadowfacts.forgelin.KotlinAdapter",
+        version = VERSION,
+        dependencies = "required-after:actuallyadditions;required-after:bloodylib",
+        name = MOD_NAME)
 object ActuallyAddon : BloodyModMain(CommonHandler) {
     const val MOD_ID = "actuallyaddon"
+    const val MOD_NAME = "Actually Addon"
     const val VERSION = "@VERSION@"
 
     @Mod.Instance
