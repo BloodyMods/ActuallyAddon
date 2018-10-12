@@ -8,7 +8,6 @@ import net.minecraft.block.ITileEntityProvider
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.inventory.IInventory
 import net.minecraft.inventory.InventoryHelper
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumHand
@@ -18,8 +17,12 @@ import net.minecraft.world.World
 class AdvancedReconstructor : Block(Material.IRON), ITileEntityProvider, IHasModel {
     init {
         registerMe("advanced_reconstructor")
+        setHardness(1f)
+
     }
 
+    override fun hasTileEntity(state: IBlockState): Boolean = true
+    
     override fun createNewTileEntity(worldIn: World, meta: Int) = TileAdvancedReconstructor()
 
     override fun onBlockActivated(worldIn: World, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean {
@@ -36,7 +39,7 @@ class AdvancedReconstructor : Block(Material.IRON), ITileEntityProvider, IHasMod
         val tile = worldIn.getTileEntity(pos) as? TileAdvancedReconstructor ?: return
 
         arrayOf(tile.stackHandlerBattery, tile.stackHandlerOutput, tile.stackHandlerInput).forEach {
-            for (i in 0 until it.slots){
+            for (i in 0 until it.slots) {
                 InventoryHelper.spawnItemStack(worldIn, pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(), it.getStackInSlot(i))
             }
         }

@@ -36,6 +36,10 @@ class TileAdvancedReconstructor : TileEntityTickingBase() {
             batteryChanged.setTrue()
             markDirty()
         }
+
+        override fun insertItem(slot: Int, stack: ItemStack, simulate: Boolean): ItemStack =
+                if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) super.insertItem(slot, stack, simulate) else stack
+
     }
 
     private val inputChanged = NBTSerializationState(this)
@@ -175,8 +179,8 @@ class TileAdvancedReconstructor : TileEntityTickingBase() {
 
     inner class ItemStackHandlerOutput : ItemStackHandler(OUTPUT_SIZE) {
         override fun onContentsChanged(slot: Int) {
-            markDirty()
-            outputChanged.setTrue()
+            // markDirty()
+            outputChanged.scheduleUpdate()
         }
 
         override fun insertItem(slot: Int, stack: ItemStack, simulate: Boolean) = stack
@@ -185,8 +189,8 @@ class TileAdvancedReconstructor : TileEntityTickingBase() {
 
     inner class ItemStackHandlerInput : ItemStackHandler(INPUT_SIZE) {
         override fun onContentsChanged(slot: Int) {
-            markDirty()
-            inputChanged.setTrue()
+            // markDirty()
+            inputChanged.scheduleUpdate()
         }
 
         // override fun extractItem(slot: Int, amount: Int, simulate: Boolean) = ItemStack.EMPTY!!
