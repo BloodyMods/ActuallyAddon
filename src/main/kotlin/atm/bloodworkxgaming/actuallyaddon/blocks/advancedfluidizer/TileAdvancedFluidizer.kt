@@ -5,8 +5,6 @@ import atm.bloodworkxgaming.bloodyLib.energy.EnergyStorageBase
 import atm.bloodworkxgaming.bloodyLib.fluid.FluidTankBase
 import atm.bloodworkxgaming.bloodyLib.networking.NBTSerializationState
 import atm.bloodworkxgaming.bloodyLib.tile.TileEntityTickingBase
-import de.ellpeck.actuallyadditions.api.ActuallyAdditionsAPI
-import de.ellpeck.actuallyadditions.api.recipe.LensConversionRecipe
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagInt
 import net.minecraft.util.EnumFacing

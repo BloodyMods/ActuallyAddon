@@ -1,9 +1,6 @@
 package atm.bloodworkxgaming.actuallyaddon.compat
 
 import atm.bloodworkxgaming.actuallyaddon.ModBlocks
-import mezz.jei.api.IModPlugin
-import mezz.jei.api.IModRegistry
-import mezz.jei.api.JEIPlugin
 import net.minecraft.item.ItemStack
 
 @JEIPlugin

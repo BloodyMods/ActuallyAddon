@@ -22,13 +22,13 @@ class AdvancedReconstructor : Block(Material.IRON), ITileEntityProvider, IHasMod
     }
 
     override fun hasTileEntity(state: IBlockState): Boolean = true
-    
+
     override fun createNewTileEntity(worldIn: World, meta: Int) = TileAdvancedReconstructor()
 
     override fun onBlockActivated(worldIn: World, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean {
         if (worldIn.isRemote) return true
 
-        worldIn.getTileEntity(pos) as? TileAdvancedReconstructor ?: return false
+        if (worldIn.getTileEntity(pos) !is TileAdvancedReconstructor) return false
 
         playerIn.openGui(ActuallyAddon.instance, GUIAdvancedReconstructor.GUI_ID, worldIn, pos.x, pos.y, pos.z)
 

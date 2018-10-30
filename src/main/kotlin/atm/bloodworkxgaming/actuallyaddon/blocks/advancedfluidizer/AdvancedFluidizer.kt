@@ -17,6 +17,7 @@ import net.minecraft.world.World
 class AdvancedFluidizer : Block(Material.IRON), ITileEntityProvider, IHasModel {
     init {
         registerMe("advanced_fluidizer")
+        setHardness(1f)
     }
 
     override fun createNewTileEntity(worldIn: World, meta: Int) = TileAdvancedFluidizer()
@@ -24,7 +25,7 @@ class AdvancedFluidizer : Block(Material.IRON), ITileEntityProvider, IHasModel {
     override fun onBlockActivated(worldIn: World, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean {
         if (worldIn.isRemote) return true
 
-        worldIn.getTileEntity(pos) as? TileAdvancedFluidizer ?: return false
+        if (worldIn.getTileEntity(pos) !is TileAdvancedFluidizer) return false
 
         playerIn.openGui(ActuallyAddon.instance, GUIAdvancedFluidizer.GUI_ID, worldIn, pos.x, pos.y, pos.z)
 
@@ -35,7 +36,7 @@ class AdvancedFluidizer : Block(Material.IRON), ITileEntityProvider, IHasModel {
         val tile = worldIn.getTileEntity(pos) as? TileAdvancedFluidizer ?: return
 
         arrayOf(tile.stackHandlerBattery, tile.stackHandlerSeed).forEach {
-            for (i in 0 until it.slots){
+            for (i in 0 until it.slots) {
                 InventoryHelper.spawnItemStack(worldIn, pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(), it.getStackInSlot(i))
             }
         }
