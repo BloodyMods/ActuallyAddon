@@ -155,6 +155,8 @@ class TileAdvancedReconstructor : TileEntityTickingBase() {
         if (compound.hasKey("battery"))
             stackHandlerBattery.deserializeNBT(compound.getCompoundTag("battery"))
 
+        println("compound = ${compound.hasKey("energy")}")
+
         if (compound.hasKey("energy"))
             energyStorage.deserializeNBT(compound.getTag("energy") as NBTTagInt?)
 
@@ -172,8 +174,11 @@ class TileAdvancedReconstructor : TileEntityTickingBase() {
             if (batteryChanged.getAndSetFalse() || incremental)
                 setTag("battery", stackHandlerBattery.serializeNBT())
 
-            if (energyChanged.getAndSetFalse() || incremental)
+            if (energyChanged.getAndSetFalse() || incremental) {
+                println("energy changed")
+
                 setTag("energy", energyStorage.serializeNBT())
+            }
         }
     }
 

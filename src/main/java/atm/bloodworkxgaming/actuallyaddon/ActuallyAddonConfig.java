@@ -14,8 +14,8 @@ public class ActuallyAddonConfig {
     public static AdvancedFluidizer advancedFluidizer = new AdvancedFluidizer();
 
     public static class AdvancedReconstructor  {
-        public int maxPowerCapacity = 100000;
-        public int maxPowerIn = 10000;
+        public int maxPowerCapacity = 5000000;
+        public int maxPowerIn = 250000;
     }
 
     public static class AdvancedFluidizer {
