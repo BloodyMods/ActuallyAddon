@@ -16,7 +16,7 @@ import net.minecraft.world.World
 
 class AdvancedFluidizer : Block(Material.IRON), ITileEntityProvider, IHasModel {
     init {
-        registerMe("advanced_fluidizer")
+        // TODO: registerMe("advanced_fluidizer")
         setHardness(1f)
     }
 

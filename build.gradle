@@ -15,7 +15,7 @@ plugins {
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.0.1"
+version = "1.0.2"
 def my_version = version
 group = "atm.bloodworkxgaming.actuallyaddon" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "actuallyaddon"
